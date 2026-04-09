@@ -12,6 +12,12 @@ public struct HomeTreeEngine: Sendable {
         self.items = [:]
     }
 
+    public init(snapshot: HomeSnapshot) {
+        self.rootID = snapshot.rootID
+        self.spaces = Dictionary(uniqueKeysWithValues: snapshot.spaces.map { ($0.id, $0) })
+        self.items = Dictionary(uniqueKeysWithValues: snapshot.items.map { ($0.id, $0) })
+    }
+
     public mutating func addSpace(name: String, parentID: UUID) -> UUID? {
         guard spaces[parentID] != nil else { return nil }
         let trimmed = name.trimmingCharacters(in: .whitespacesAndNewlines)
@@ -125,6 +131,14 @@ public struct HomeTreeEngine: Sendable {
             .sorted(by: { $0.name < $1.name })
 
         return (foundSpaces, foundItems)
+    }
+
+    public func snapshot() -> HomeSnapshot {
+        HomeSnapshot(
+            rootID: rootID,
+            spaces: spaces.values.sorted(by: { $0.name < $1.name }),
+            items: items.values.sorted(by: { $0.name < $1.name })
+        )
     }
 
     private func descendantSpaceIDs(startingAt id: UUID) -> [UUID] {

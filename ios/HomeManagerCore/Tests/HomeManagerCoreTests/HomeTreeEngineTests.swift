@@ -64,3 +64,38 @@ final class HomeTreeEngineTests: XCTestCase {
         XCTAssertEqual(engine.items[itemID]?.quantity, 1)
     }
 }
+
+extension HomeTreeEngineTests {
+    func testSnapshotRoundtrip() throws {
+        var engine = HomeTreeEngine(rootName: "我的家")
+        let roomID = engine.addSpace(name: "主卧", parentID: engine.rootID)!
+        _ = engine.addItem(name: "护照", spaceID: roomID, tags: ["证件"])
+
+        let snapshot = engine.snapshot()
+        let data = try HomeSnapshotCoder.encode(snapshot)
+        let restored = try HomeSnapshotCoder.decode(data)
+        let restoredEngine = HomeTreeEngine(snapshot: restored)
+
+        XCTAssertEqual(restoredEngine.rootID, engine.rootID)
+        XCTAssertEqual(restoredEngine.spaces.count, engine.spaces.count)
+        XCTAssertEqual(restoredEngine.items.count, engine.items.count)
+    }
+
+    func testSnapshotFileStoreSaveAndLoad() throws {
+        var engine = HomeTreeEngine(rootName: "我的家")
+        let roomID = engine.addSpace(name: "书房", parentID: engine.rootID)!
+        _ = engine.addItem(name: "硬盘", spaceID: roomID, quantity: 2)
+
+        let snapshot = engine.snapshot()
+        let tempDir = FileManager.default.temporaryDirectory
+        let fileURL = tempDir.appendingPathComponent("home_manager_snapshot_test.json")
+
+        try HomeSnapshotFileStore.save(snapshot, to: fileURL)
+        let loaded = try HomeSnapshotFileStore.load(from: fileURL)
+        defer { try? FileManager.default.removeItem(at: fileURL) }
+
+        XCTAssertEqual(loaded.rootID, snapshot.rootID)
+        XCTAssertEqual(loaded.spaces.count, snapshot.spaces.count)
+        XCTAssertEqual(loaded.items.count, snapshot.items.count)
+    }
+}

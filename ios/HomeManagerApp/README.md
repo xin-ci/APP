@@ -48,6 +48,7 @@
 - `deleteSpace` 递归删除
 - scoped search
 - 数量最小值保护
+- 快照导入/导出（JSON）
 
 执行：
 
