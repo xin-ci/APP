@@ -93,6 +93,19 @@ struct HomeTreeView: View {
             }
             .padding()
             .navigationTitle("全屋管理")
+            .toolbar {
+                ToolbarItem(placement: .topBarTrailing) {
+                    NavigationLink {
+                        SettingsView(
+                            onExport: viewModel.exportSnapshot,
+                            onImport: viewModel.importSnapshot,
+                            statusMessage: viewModel.snapshotStatusMessage
+                        )
+                    } label: {
+                        Image(systemName: "gearshape")
+                    }
+                }
+            }
         }
     }
 }

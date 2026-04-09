@@ -6,6 +6,7 @@ final class HomeViewModel: ObservableObject {
     @Published var newSpaceName: String = ""
     @Published var newItemName: String = ""
     @Published var searchText: String = ""
+    @Published var snapshotStatusMessage: String = ""
 
     private let store: HomeStore
 
@@ -70,4 +71,27 @@ final class HomeViewModel: ObservableObject {
     func incrementItem(_ id: UUID, current: Int) {
         store.updateItemQuantity(id, quantity: current + 1)
     }
+
+
+    func exportSnapshot() {
+        do {
+            let url = try store.exportSnapshot()
+            snapshotStatusMessage = "备份已导出：\(url.path)"
+        } catch {
+            snapshotStatusMessage = "导出失败：\(error.localizedDescription)"
+        }
+    }
+
+    func importSnapshot() {
+        do {
+            try store.importSnapshot()
+            if store.space(id: selectedSpaceID) == nil {
+                selectedSpaceID = store.rootID
+            }
+            snapshotStatusMessage = "已从本地备份恢复"
+        } catch {
+            snapshotStatusMessage = "恢复失败：\(error.localizedDescription)"
+        }
+    }
+
 }

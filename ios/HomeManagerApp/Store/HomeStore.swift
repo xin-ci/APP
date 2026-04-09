@@ -6,7 +6,7 @@ final class HomeStore: ObservableObject {
     @Published private(set) var spaces: [UUID: SpaceNode]
     @Published private(set) var items: [UUID: ItemNode]
 
-    let rootID: UUID
+    private(set) var rootID: UUID
 
     init() {
         let root = SpaceNode(name: "我的家", icon: "house.fill", colorHex: "#4F46E5")
@@ -153,6 +153,30 @@ final class HomeStore: ObservableObject {
             .sorted { $0.name < $1.name }
 
         return (spaceResult, itemResult)
+    }
+
+
+
+    func exportSnapshot(to fileURL: URL = AppSnapshotStore.defaultFileURL) throws -> URL {
+        let snapshot = AppSnapshot(
+            spaces: Array(spaces.values),
+            items: Array(items.values),
+            rootID: rootID
+        )
+        try AppSnapshotStore.save(snapshot: snapshot, to: fileURL)
+        return fileURL
+    }
+
+    func importSnapshot(from fileURL: URL = AppSnapshotStore.defaultFileURL) throws {
+        let snapshot = try AppSnapshotStore.load(from: fileURL)
+        rootID = snapshot.rootID
+        spaces = Dictionary(uniqueKeysWithValues: snapshot.spaces.map { ($0.id, $0) })
+        items = Dictionary(uniqueKeysWithValues: snapshot.items.map { ($0.id, $0) })
+
+        if spaces[rootID] == nil {
+            let root = SpaceNode(id: rootID, name: "我的家", parentID: nil, icon: "house.fill")
+            spaces[rootID] = root
+        }
     }
 
     private func collectDescendantSpaceIDs(startingAt id: UUID) -> [UUID] {

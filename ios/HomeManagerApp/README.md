@@ -10,6 +10,7 @@
 - 搜索当前空间下的子空间与物品
 - 物品详情页（数量调整、删除）
 - 空间删除（递归删除子空间与其物品）
+- 设置页支持 JSON 备份导出/导入
 - 基础防循环移动校验（数据层）
 
 ## 目录
@@ -20,6 +21,8 @@
 - `ViewModels/HomeViewModel.swift`: 页面状态与操作
 - `Views/HomeTreeView.swift`: 首页可视化操作界面
 - `Views/ItemDetailView.swift`: 物品详情页
+- `Views/SettingsView.swift`: 备份与恢复设置页
+- `Store/AppSnapshotStore.swift`: App 侧 JSON 快照存储
 
 ## 已覆盖的核心用例
 
