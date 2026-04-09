@@ -37,3 +37,21 @@
 3. 加入拖拽排序、拖拽移动、批量操作
 4. 接入 CloudKit 同步与冲突处理
 5. 完成隐私政策与删除账号流程页面（若引入账号）
+
+## Core 逻辑测试（Linux/macOS 可跑）
+
+为了支持在非 Apple UI 环境中做自动化验证，仓库新增了 `ios/HomeManagerCore` Swift Package，包含纯数据结构与树操作引擎，并带有 XCTest：
+
+- `addSpace` / `addItem`
+- `breadcrumb`
+- `moveSpace` 防环
+- `deleteSpace` 递归删除
+- scoped search
+- 数量最小值保护
+
+执行：
+
+```bash
+cd ios/HomeManagerCore
+swift test
+```
